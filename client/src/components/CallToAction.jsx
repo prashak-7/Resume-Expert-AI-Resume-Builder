@@ -10,7 +10,7 @@ const CallToAction = () => {
           platform
         </p>
         <Link
-          to="/app"
+          to="/dashboard"
           className="flex items-center gap-2 rounded py-3 px-8 bg-indigo-600 hover:bg-indigo-700 transition text-white"
         >
           <span>Start Building Now</span>

@@ -24,17 +24,17 @@ const Features = () => {
   ];
   return (
     <>
-      <div class="text-center">
-        <h2 class="text-3xl md:text-4xl font-semibold text-center mx-auto mt-4">
+      <div className="text-center">
+        <h2 className="text-3xl md:text-4xl font-semibold text-center mx-auto mt-10">
           Why should you choose{" "}
           <span className="text-indigo-600">ResumeExpert?</span>
         </h2>
-        <p class="mt-6 text-slate-600 max-w-xl mx-auto">
+        <p className="mt-6 text-slate-600 max-w-xl mx-auto">
           Everything you need to build a standout, professional resume
           effortlessly, designed to impress recruiters and land your dream job
         </p>
       </div>
-      <div class="flex flex-wrap items-center justify-center gap-6 md:gap-4 mt-16 px-6">
+      <div className="flex flex-wrap items-center justify-center gap-6 md:gap-4 mt-16 px-6">
         {featuresData.map((feature, index) => {
           const Icon = feature.icon;
           return (

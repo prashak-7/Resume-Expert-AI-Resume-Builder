@@ -1,23 +1,21 @@
 import { Menu, Star, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Logo from "./Logo";
 
 const Hero = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(true);
+  }, []);
 
   return (
     <div className="min-h-[75vh] md:min-h-screen md:pb-16">
       <nav className="z-40 w-full px-4 py-4 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between border-b border-b-gray-300">
-        <Link to="/" className="flex items-center gap-2">
-          <img
-            src="/logo.svg"
-            alt="Resume Expert Logo"
-            className="size-6 md:size-8"
-          />
-          <span className="text-indigo-600 font-bold md:text-lg">
-            ResumeExpert
-          </span>
-        </Link>
+        <Logo />
 
         <ul className="hidden md:flex items-center gap-8 transition duration-500 text-slate-800">
           <a href="#" className="hover:text-indigo-600 transition">
@@ -32,42 +30,53 @@ const Hero = () => {
         </ul>
 
         <div className="flex gap-2">
-          <Link
-            to="/signup"
-            className="hidden md:block px-6 py-2 bg-indigo-600 hover:bg-indigo-500 transition rounded-full text-white"
-          >
-            Get Started
-          </Link>
+          {user ? (
+            <Link
+              to="/dashboard"
+              className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 transition rounded-full text-white"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/register"
+                className="hidden md:block px-6 py-2 bg-indigo-600 hover:bg-indigo-500 transition rounded-full text-white"
+              >
+                Get Started
+              </Link>
 
-          <Link
-            to="/login"
-            className="hidden md:block rounded-full border hover:bg-slate-50 px-6 py-2"
-          >
-            Login
-          </Link>
+              <Link
+                to="/login"
+                className="hidden md:block rounded-full border hover:bg-slate-50 px-6 py-2"
+              >
+                Login
+              </Link>
+            </>
+          )}
         </div>
 
-        <button
-          onClick={() => setMenuOpen(true)}
-          className="md:hidden active:scale-80 transition"
-        >
-          <Menu />
-        </button>
+        {!user && (
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="md:hidden active:scale-80 transition"
+          >
+            <Menu />
+          </button>
+        )}
       </nav>
       <div
         className={`fixed inset-0 z-100 bg-black/40 text-black backdrop-blur flex flex-col items-center justify-center text-lg gap-8 md:hidden transition-transform duration-300 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <a href="#" className="text-white">
-          Home
-        </a>
-        <a href="#" className="text-white">
-          Features
-        </a>
-        <a href="#" className="text-white">
-          Testimonials
-        </a>
+        <Link to="/register" className="text-white">
+          Get started
+        </Link>
+        <Link to="/login" className="text-white">
+          Login
+        </Link>
+
         <button
           onClick={() => setMenuOpen(false)}
           className="aspect-square size-10 p-1 text-white flex items-center justify-center"
@@ -130,7 +139,7 @@ const Hero = () => {
             and customizable templates.
           </p>
           <Link
-            to="/app"
+            to="/dashboard"
             className="block outline outline-slate-400 outline-offset-3 md:text-2xl px-6 py-2 bg-indigo-600 hover:bg-indigo-500 transition rounded-full text-white w-fit mx-auto mt-4 md:mt-6"
           >
             Create my resume
