@@ -8,6 +8,7 @@ import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import { ResumeProvider } from "./context/ResumeContext";
 import ResumeBuilder from "./pages/ResumeBuilder";
+import Preview from "./pages/Preview";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
               <Route index element={<Dashboard />} />
               <Route path="builder/:resumeId" element={<ResumeBuilder />} />
             </Route>
+            <Route path="/view/:resumeId" element={<Preview />} />
           </Routes>
         </ResumeProvider>
       </AuthProvider>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Empty,
   EmptyContent,
@@ -41,11 +41,31 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { useResume } from "@/context/ResumeContext";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const [title, setTitle] = useState("");
-  const { loading, resumes, createResume, deleteResume, editResumeTitle } =
-    useResume();
+  const {
+    loading,
+    resumes,
+    createResume,
+    deleteResume,
+    editResumeTitle,
+    loadResumes,
+  } = useResume();
+  const [showEditResume, setShowEditResume] = useState(false);
+  const navigate = useNavigate();
+
+  const handleEditResume = (resumeId, title) => {
+    if (!title) return toast.error("Please provide a title for your resume");
+    editResumeTitle(resumeId, title);
+    setShowEditResume(false);
+  };
+
+  useEffect(() => {
+    loadResumes();
+  }, []);
 
   if (loading)
     return (
@@ -70,7 +90,10 @@ const Dashboard = () => {
           <Dialog>
             <form>
               <DialogTrigger asChild>
-                <button className="w-full sm:px-6 bg-white sm:max-w-full h-48 flex flex-col items-center justify-center rounded-lg gap-2 text-slate-600 border border-dashed border-slate-300 group hover:border-indigo-500 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                <button
+                  className="w-full sm:px-6 bg-white sm:max-w-full h-48 flex flex-col items-center justify-center rounded-lg gap-2 text-slate-600 border border-dashed border-slate-300 group hover:border-indigo-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  onClick={() => setTitle("")}
+                >
                   <FilePlus2 className="text-indigo-400 group-hover:text-indigo-600" />
                   <p>New Resume</p>
                 </button>
@@ -107,17 +130,20 @@ const Dashboard = () => {
             </form>
           </Dialog>
           {resumes.map((resume) => (
-            <button
+            <div
               key={resume._id}
+              onClick={() => {
+                navigate(`/dashboard/builder/${resume._id}`);
+              }}
               className="relative w-full sm:max-w-36 h-48 flex flex-col items-center justify-center rounded-lg gap-2 border group hover:shadow-lg transition-all duration-300 cursor-pointer bg-linear-to-br from-indigo-100 to-indigo-300"
             >
-              <div className="absolute opacity-0 group-hover:opacity-100 top-3 right-2 flex items-center gap-2">
+              <div
+                className="absolute top-3 right-2 flex items-center gap-2"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Trash2Icon
-                      size={18}
-                      className="text-slate-600 hover:scale-120"
-                    />
+                    <Trash2Icon className="size-5 text-slate-600 hover:scale-110" />
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -132,21 +158,19 @@ const Dashboard = () => {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
+                        className="bg-red-500 hover:bg-red-600 transition-all duration-200"
                         onClick={() => deleteResume(resume._id)}
                       >
-                        Continue
+                        Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
 
-                <Dialog>
+                <Dialog open={showEditResume} onOpenChange={setShowEditResume}>
                   <form>
                     <DialogTrigger asChild>
-                      <PencilIcon
-                        size={18}
-                        className="text-slate-600 hover:scale-120"
-                      />
+                      <PencilIcon className="size-5 text-slate-600 hover:scale-110" />
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                       <DialogHeader>
@@ -158,21 +182,25 @@ const Dashboard = () => {
                           <Input
                             id="name-1"
                             name="name"
-                            value={resume.title}
-                            onChange={(e) => setTitle(e.target.value)}
                             placeholder="Enter resume title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
                           />
                         </div>
                       </div>
                       <DialogFooter>
-                        <DialogClose asChild>
-                          <Button variant="outline">Cancel</Button>
-                        </DialogClose>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowEditResume(false)}
+                        >
+                          Cancel
+                        </Button>
+
                         <Button
                           type="submit"
-                          onClick={() => editResumeTitle(title)}
+                          onClick={() => handleEditResume(resume._id, title)}
                         >
-                          Update
+                          Save changes
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -187,7 +215,7 @@ const Dashboard = () => {
               <p className="absolute bottom-1 text-[11px] text-slate-400 group-hover:text-slate-500 transition-all duration-300 px-2 text-center">
                 Updated on {new Date(resume.updatedAt).toLocaleDateString()}
               </p>
-            </button>
+            </div>
           ))}
         </div>
       ) : (
@@ -210,6 +238,7 @@ const Dashboard = () => {
                     <Button
                       variant="outline"
                       className="bg-indigo-600 hover:bg-indigo-500 hover:text-white text-white text-md py-4"
+                      onClick={() => setTitle("")}
                     >
                       Create Your First Resume
                     </Button>

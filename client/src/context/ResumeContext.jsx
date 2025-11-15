@@ -9,15 +9,13 @@ export const ResumeProvider = ({ children }) => {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  console.log(resumes);
-
   const navigate = useNavigate();
 
   const loadResumes = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("You are not authenticated");
+
       const { data } = await api.get("/api/users/resumes", {
         headers: {
           Authorization: token,
@@ -25,7 +23,7 @@ export const ResumeProvider = ({ children }) => {
       });
       setResumes(data.resumes);
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      console.error(error?.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
@@ -34,6 +32,8 @@ export const ResumeProvider = ({ children }) => {
   const createResume = async (title) => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("You are not authenticated");
+    if (!title) return toast.error("Please provide a title for your resume");
+
     try {
       const { data } = await api.post(
         "/api/resumes/create",
@@ -46,6 +46,27 @@ export const ResumeProvider = ({ children }) => {
       );
       setResumes([...resumes, data.resume]);
       navigate(`/dashboard/builder/${data.resume._id}`);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+    }
+  };
+
+  const editResumeTitle = async (resumeId, title) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("You are not authenticated");
+
+    try {
+      const { data } = await api.put(
+        "/api/resumes/update",
+        { resumeId, resumeData: { title } },
+        { headers: { Authorization: token } }
+      );
+      setResumes(
+        resumes.map((resume) =>
+          resume._id === resumeId ? { ...resume, title } : resume
+        )
+      );
+      toast.success(data.message);
     } catch (error) {
       toast.error(error?.response?.data?.message || error.message);
     }
@@ -79,6 +100,7 @@ export const ResumeProvider = ({ children }) => {
         setResumes,
         loadResumes,
         createResume,
+        editResumeTitle,
         deleteResume,
       }}
     >
